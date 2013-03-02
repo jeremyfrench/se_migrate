@@ -1,0 +1,8 @@
+name = Stack Exchange Migrate
+description = Demo migration using stack exchange data
+core = 7.x
+
+dependencies[] = migrate
+dependencies[] = migrate_extras
+
+files[] = se_migrate.migrate.inc
