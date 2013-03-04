@@ -191,14 +191,15 @@ class MigrateSePosts extends XMLMigration {
          ->sourceMigration('MigrateSeUser');
     
     /* Tags */
-    /*
-     * $this->addFieldMapping('field_tags', 'Tags')
+   
+    $this->addFieldMapping('field_tags', 'Tags')
          ->xpath('@Tags')
-         ->separator('&gt;');
+         ->separator(',');
+         
 
     $this->addFieldMapping('field_tags:create_term')->defaultValue(TRUE);
     $this->addFieldMapping('field_tags:ignore_case')->defaultValue(TRUE);
-     */
+    
          // TODO: add view count.
     
     // Static values
@@ -219,14 +220,14 @@ class MigrateSePosts extends XMLMigration {
    * it is passed into the source.
    */
   function prepareRow($row) {
-    // Un escape special chars.
-    $row->Body = htmlspecialchars_decode($row->body);
     
-    /*
-    $row->Tags = htmlspecialchars_decode($row->Tags);
-    $row->Tags = str_replace('>',',',$row->Tags);
-    $row->Tags = str_replace('<', '',$row->Tags);    
-     */
+    //Turn XML list into comma seperated list  
+    $attributes = $row->xml->attributes();
+    $tags = $attributes['Tags'];
+    $tags = str_replace('>',',',$tags);
+    $tags = str_replace('<', '',$tags);
+    $row->xml['Tags'] = $tags;    
+    
   }
     
 }
