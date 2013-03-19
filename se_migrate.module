@@ -1,1 +1,95 @@
 <?php
+
+
+/**
+ * Implements hook_node_info().
+ */
+function se_migrate_node_info() {
+  $types = array();
+  
+  $types['sequestion'] = array(
+    'name' => t('Stack exchange question'),
+    'description' => 'Container for holding stack exchange question information',
+    'base' => 'se_migrate',
+    'has_title' => TRUE,
+    'title_label' => t('Subject'),
+  );
+  
+  
+  $types['seanswer'] = array(
+      'name' => t('Stack exchange answer'),
+      'description' => 'Container for holding stack exchange question information',
+      'base' => 'se_migrate',
+      'has_title' => FALSE,
+  );
+  
+  
+  
+  
+  return $types;
+}
+
+/**
+ * Implement hook_form().
+ * Just so that the node type is listed. 
+ */
+function se_migrate_form($node, &$form_state) {
+  $type = node_type_get_type($node);
+  
+  $form = array();
+  if($type == 'sequestion') {
+    $form['title'] = array(
+      '#type' => 'textfield',
+      '#title' => check_plain($type->title_label),
+      '#default_value' => !empty($node->title) ? $node->title : '',
+      '#required' => TRUE,
+      '#weight' => -5,
+    );
+  }
+  
+  return $form;
+}
+
+/**
+ * Implements hook_node_type_insert(). 
+ * When the node types are added add the fields we need to them.
+ * This can also be done in an install hook, but I believe this is 
+ * better practice.
+ */
+function se_migrate_node_type_insert($content_type) {
+  if ($content_type->type == 'sequestion') {
+    $types = node_type_get_types();
+    node_add_body_field($content_type);
+    // TODO: voting field.
+    
+    // little hack assume that tags field exsists
+    $vocabulary = taxonomy_vocabulary_machine_name_load('Tags');
+    $instance = array(
+      'field_name' => 'field_' . $vocabulary->machine_name,
+      'entity_type' => 'node',
+      'label' => 'Tags',
+      'bundle' => 'sequestion',
+      'description' => 'Tags',
+      'widget' => array(
+        'type' => 'taxonomy_autocomplete',
+        'weight' => -4,
+      ),
+      'display' => array(
+        'default' => array(
+          'type' => 'taxonomy_term_reference_link',
+          'weight' => 10,
+        ),
+        'teaser' => array(
+          'type' => 'taxonomy_term_reference_link',
+          'weight' => 10,
+        ),
+      ),
+    );
+  field_create_instance($instance);
+  }
+  else if ($content_type->type == 'seanswer') {
+    node_add_body_field($content_type);
+    // TODO: voting field.
+    
+  }
+}

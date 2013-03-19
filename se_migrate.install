@@ -4,8 +4,6 @@
  * Implements hook_install().
  */
 function se_migrate_install() {
-  // Set up any content types
-  
   // Register Migrations can be done in install hook or any time in code by calling registermigrations
   // Migration::registerMigration(seUserMigration, 'demo_user_migration', array());
 }
